@@ -1,4 +1,4 @@
-#[derive(PartialEq)]
+#[derive(PartialEq,Copy, Clone)]
 pub enum Rank {
     Ace,
     Two,
@@ -7,7 +7,7 @@ pub enum Rank {
     Five,
     Six,
 }
-#[derive(PartialEq)]
+#[derive(PartialEq, Copy, Clone)]
 pub enum Suit {
     Clubs,
     Diamonds,
@@ -15,6 +15,7 @@ pub enum Suit {
     Spades,
 }
 
+#[derive(Copy, Clone)]
 pub struct Card {
     rank: Rank,
     suit: Suit,

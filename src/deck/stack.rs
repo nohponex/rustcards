@@ -1,5 +1,9 @@
 use crate::deck::card::Card;
 
+use rand::thread_rng;
+use rand::seq::SliceRandom;
+
+
 pub struct Stack {
     cards: Vec<Card>,
 }
@@ -17,8 +21,11 @@ impl Stack {
         self.cards.push(card)
     }
 
-    fn peek(&self) -> Option<&Card> {
-        self.cards.get(0)
+    fn peek(&self) -> Option<Card> {
+        match self.cards.get(0)  {
+            None => None,
+            Some(&x) => Some(x)
+        }
     }
 
     fn pop(&mut self) -> Option<Card> {
@@ -28,11 +35,16 @@ impl Stack {
     pub fn len(&self) -> u32 {
         self.cards.len() as u32
     }
+
+    pub fn shuffle(&mut self) {
+        self.cards.shuffle(&mut thread_rng())
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::deck::card::{Card, Rank, Suit};
+    use crate::deck::deck;
     use crate::deck::stack::Stack;
 
     #[test]
@@ -54,5 +66,16 @@ mod tests {
         let peeked = s.peek().unwrap();
 
         assert!(peeked.equals(Card::new(Rank::Ace, Suit::Clubs)));
+    }
+
+    #[test]
+    fn test_shuffle() {
+        let mut stack = deck::Deck();
+
+        let first = stack.peek().unwrap();
+
+        stack.shuffle();
+
+        assert!(!stack.peek().unwrap().equals(first));
     }
 }
