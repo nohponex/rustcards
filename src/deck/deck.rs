@@ -2,7 +2,7 @@ use crate::deck::card::{Card, Rank, Suit};
 use crate::Stack;
 
 pub fn deck() -> Stack {
-    Stack::fromVec(vec![
+    Stack::from_vec(vec![
         Card::new(Rank::Ace, Suit::Clubs),
         Card::new(Rank::Two, Suit::Clubs),
         Card::new(Rank::Three, Suit::Clubs),

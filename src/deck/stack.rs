@@ -9,11 +9,11 @@ pub struct Stack {
 }
 
 impl Stack {
-    pub fn newEmpty() -> Stack {
+    pub fn empty() -> Stack {
         Stack { cards: vec![] }
     }
 
-    pub fn fromVec(from: Vec<Card>) -> Stack {
+    pub fn from_vec(from: Vec<Card>) -> Stack {
         Stack { cards: from }
     }
 
