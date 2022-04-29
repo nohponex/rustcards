@@ -1,3 +1,4 @@
+use std::fmt;
 
 #[derive(Debug, PartialEq, Eq, Hash, Copy, Clone)]
 pub enum Player {
@@ -5,6 +6,17 @@ pub enum Player {
     Player2,
     Player3,
     Player4,
+}
+
+impl fmt::Display for Player {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match *self {
+            Player::Player1 => write!(f, "1"),
+            Player::Player2 => write!(f, "2"),
+            Player::Player3 => write!(f, "3"),
+            Player::Player4 => write!(f, "4"),
+        }
+    }
 }
 
 impl Player {

@@ -1,3 +1,4 @@
+use std::fmt;
 use crate::deck::card::Card;
 
 use rand::thread_rng;
@@ -8,6 +9,14 @@ pub struct Stack {
     cards: Vec<Card>,
 }
 
+
+impl fmt::Display for Stack {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let mapped = self.cards.iter().map(|c|  String::from(format!("{}", c)) ).collect::<Vec<_>>();
+
+        write!(f, "{}",mapped.join(", "))
+    }
+}
 impl Stack {
     pub fn empty() -> Stack {
         Stack { cards: vec![] }

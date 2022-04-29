@@ -10,6 +10,7 @@ struct Game {
     deck: Stack,
     number_of_players: u8,
     stacks: HashMap<Player, Stack>,
+    picked: HashMap<Player, Stack>,
 }
 impl Game {
     fn new(number_of_players: u8, mut deck: Stack) -> Game {
@@ -20,6 +21,7 @@ impl Game {
             played.push(c)
         }
         let mut stacks = HashMap::with_capacity(number_of_players as usize);
+        let mut picked = HashMap::with_capacity(number_of_players as usize);
 
         let mut current_player = Player::Player1;
 
@@ -30,6 +32,7 @@ impl Game {
                 player_stack.push(c);
             }
             stacks.insert(current_player, player_stack);
+            picked.insert(current_player, Stack::empty());
             current_player = current_player.next(number_of_players)
         }
 
@@ -39,7 +42,18 @@ impl Game {
             played: played,
             stacks: stacks,
             deck: deck,
+            picked: picked,
         }
+    }
+
+    pub fn print(&self) {
+        println!("state:");
+        println!("cards down: {}", self.played);
+        println!("current player turn: {}", self.current_player);
+        println!(
+            "player can play on of: {}",
+            self.stacks.get(&self.current_player).unwrap()
+        );
     }
 }
 
@@ -61,5 +75,11 @@ mod test {
         assert_eq!(g.stacks.get(&Player::Player2).unwrap().len(), 6);
         assert_eq!(g.stacks.get(&Player::Player3).unwrap().len(), 6);
         assert_eq!(g.stacks.get(&Player::Player4).unwrap().len(), 6);
+    }
+
+    #[test]
+    fn testPrint() {
+        let g = Game::new(4, deck());
+        g.print()
     }
 }
