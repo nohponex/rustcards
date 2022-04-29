@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(PartialEq, Copy, Clone)]
 pub enum Rank {
     Ace,
@@ -14,12 +16,44 @@ pub enum Rank {
     Queen,
     King,
 }
+
+impl fmt::Display for Rank {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match *self {
+            Rank::Ace => write!(f, "A"),
+            Rank::Two => write!(f, "2"),
+            Rank::Three => write!(f, "3"),
+            Rank::Four => write!(f, "4"),
+            Rank::Five => write!(f, "5"),
+            Rank::Six => write!(f, "6"),
+            Rank::Seven => write!(f, "7"),
+            Rank::Eight => write!(f, "8"),
+            Rank::Nine => write!(f, "9"),
+            Rank::Ten => write!(f, "10"),
+            Rank::Jack => write!(f, "J"),
+            Rank::Queen => write!(f, "Q"),
+            Rank::King => write!(f, "K"),
+        }
+    }
+}
+
 #[derive(PartialEq, Copy, Clone)]
 pub enum Suit {
     Clubs,
     Diamonds,
     Hearts,
     Spades,
+}
+
+impl fmt::Display for Suit {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match *self {
+            Suit::Clubs => write!(f, "♣"),
+            Suit::Diamonds => write!(f, "♦"),
+            Suit::Hearts => write!(f, "♥"),
+            Suit::Spades => write!(f, "♠"),
+        }
+    }
 }
 
 #[derive(Copy, Clone)]
@@ -38,10 +72,15 @@ impl Card {
     }
 }
 
+impl fmt::Display for Card {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "[{}, {}]", self.rank, self.suit)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::deck::card::{Card, Rank, Suit};
-
     #[test]
     fn test_equals() {
         assert!(Card::new(Rank::Ace, Suit::Clubs).equals(Card::new(Rank::Ace, Suit::Clubs)))
@@ -51,5 +90,9 @@ mod tests {
         assert!(!Card::new(Rank::Ace, Suit::Clubs).equals(Card::new(Rank::Two, Suit::Clubs)));
 
         assert!(!Card::new(Rank::Ace, Suit::Clubs).equals(Card::new(Rank::Ace, Suit::Hearts)));
+    }
+    #[test]
+    fn test_print() {
+        assert_eq!(format!("{}", Card::new(Rank::Ace, Suit::Clubs)), "[A, ♣]");
     }
 }
