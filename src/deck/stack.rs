@@ -70,7 +70,7 @@ mod tests {
 
     #[test]
     fn test_shuffle() {
-        let mut stack = deck::Deck();
+        let mut stack = deck::deck();
 
         let first = stack.peek().unwrap();
 

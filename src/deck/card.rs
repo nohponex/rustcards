@@ -6,6 +6,13 @@ pub enum Rank {
     Four,
     Five,
     Six,
+    Seven,
+    Eight,
+    Nine,
+    Ten,
+    Jack,
+    Queen,
+    King,
 }
 #[derive(PartialEq, Copy, Clone)]
 pub enum Suit {
