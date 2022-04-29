@@ -49,7 +49,7 @@ mod tests {
 
     #[test]
     fn test_peek_given_empty() {
-        let s = Stack::newEmpty();
+        let s = Stack::empty();
         assert_eq!(s.len(), 0);
 
         assert!(s.peek().is_none())
@@ -59,7 +59,7 @@ mod tests {
     fn test_peek_given_not_empty() {
         let card = Card::new(Rank::Ace, Suit::Clubs);
 
-        let mut s = Stack::newEmpty();
+        let mut s = Stack::empty();
         s.push(card);
         assert_eq!(s.len(), 1);
 
