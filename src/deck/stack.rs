@@ -12,7 +12,7 @@ pub struct Stack {
 
 impl fmt::Display for Stack {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let mapped = self.cards.iter().map(|c|  String::from(format!("{}", c)) ).collect::<Vec<_>>();
+        let mapped: Vec<_> = self.cards.iter().map(|c|  format!("{}", c)).collect();
 
         write!(f, "{}",mapped.join(", "))
     }
