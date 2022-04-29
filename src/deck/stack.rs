@@ -17,7 +17,7 @@ impl Stack {
         Stack { cards: from }
     }
 
-    fn push(&mut self, card: Card) {
+    pub fn push(&mut self, card: Card) {
         self.cards.push(card)
     }
 
@@ -28,7 +28,7 @@ impl Stack {
         }
     }
 
-    fn pop(&mut self) -> Option<Card> {
+    pub fn pop(&mut self) -> Option<Card> {
         self.cards.pop()
     }
 
