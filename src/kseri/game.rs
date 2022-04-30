@@ -34,7 +34,7 @@ impl Game {
         let mut picked = players_iter()
             .map(|key| (key, Stack::empty()))
             .collect();
-        let mut kseres = players_iter()
+        let mut points = players_iter()
             .map(|key| (key, 0))
             .collect();
 
@@ -45,7 +45,7 @@ impl Game {
             stacks: stacks,
             deck: deck,
             picked: picked,
-            points: kseres,
+            points: points,
             ended: false,
         };
 
