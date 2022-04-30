@@ -1,4 +1,6 @@
+use crate::deck::card::{Card, Rank};
 use crate::deck::stack;
+use crate::kseri::action::Action;
 use crate::kseri::player::Player;
 use crate::Stack;
 use std::collections::HashMap;
@@ -11,6 +13,7 @@ struct Game {
     number_of_players: u8,
     stacks: HashMap<Player, Stack>,
     picked: HashMap<Player, Stack>,
+    kseres: HashMap<Player, u8>,
 }
 impl Game {
     fn new(number_of_players: u8, mut deck: Stack) -> Game {
@@ -22,6 +25,7 @@ impl Game {
         }
         let mut stacks = HashMap::with_capacity(number_of_players as usize);
         let mut picked = HashMap::with_capacity(number_of_players as usize);
+        let mut kseres = HashMap::with_capacity(number_of_players as usize);
 
         let mut current_player = Player::Player1;
 
@@ -33,6 +37,7 @@ impl Game {
             }
             stacks.insert(current_player, player_stack);
             picked.insert(current_player, Stack::empty());
+            kseres.insert(current_player, 0);
             current_player = current_player.next(number_of_players)
         }
 
@@ -43,6 +48,35 @@ impl Game {
             stacks: stacks,
             deck: deck,
             picked: picked,
+            kseres: kseres,
+        }
+    }
+
+    fn apply(&mut self, action: Action) {
+        match action {
+            Action::Played(card) => {
+                //make sure player had this card and remove it
+                if !self
+                    .stacks
+                    .get_mut(&self.current_player)
+                    .unwrap()
+                    .remove(&card)
+                {
+                    panic!("not allowed card");
+                }
+
+                match (self.played.peek(), card.rank()) {
+                    (Some(a), b) if a.rank() == b => {
+                        //self.kseres.get_mut(&self.current_player).unwrap().
+                        //todo take all
+                    }
+                    (Some(_), Rank::Jack) => {
+                        //todo take all
+                    }
+                    (_, _) => self.played.push(card),
+                }
+            }
+            Action::Folded => {}
         }
     }
 

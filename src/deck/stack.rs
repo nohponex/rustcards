@@ -28,7 +28,7 @@ impl Stack {
         self.cards.push(card)
     }
 
-    fn peek(&self) -> Option<Card> {
+    pub fn peek(&self) -> Option<Card> {
         match self.cards.get(0)  {
             None => None,
             Some(&x) => Some(x)
@@ -39,6 +39,15 @@ impl Stack {
         self.cards.pop()
     }
 
+    pub fn remove(&mut self, card: &Card) -> bool {
+        let len_before = self.len();
+        self.cards.retain(|&c| !c.equals(card));
+
+        if self.len() < len_before {
+            return true
+        }
+        return false
+    }
     pub fn len(&self) -> u32 {
         self.cards.len() as u32
     }
@@ -72,7 +81,7 @@ mod tests {
 
         let peeked = s.peek().unwrap();
 
-        assert!(peeked.equals(Card::new(Rank::Ace, Suit::Clubs)));
+        assert!(peeked.equals(&Card::new(Rank::Ace, Suit::Clubs)));
     }
 
     #[test]
@@ -83,6 +92,16 @@ mod tests {
 
         stack.shuffle();
 
-        assert!(!stack.peek().unwrap().equals(first));
+        assert!(!stack.peek().unwrap().equals(&first));
+    }
+
+    #[test]
+    fn test_remove() {
+        let mut s = Stack::from_vec(vec![Card::new(Rank::Ace, Suit::Clubs)]);
+
+        assert!(!s.remove(&Card::new(Rank::Two, Suit::Diamonds)));
+        assert!(s.remove(&Card::new(Rank::Ace, Suit::Clubs)));
+
+        assert_eq!(s.len(), 0)
     }
 }

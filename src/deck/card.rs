@@ -67,8 +67,14 @@ impl Card {
         Self { rank, suit }
     }
 
-    pub fn equals(&self, card: Card) -> bool {
+    pub fn equals(&self, card: &Card) -> bool {
         return self.suit == card.suit && self.rank == card.rank;
+    }
+    pub fn rank(&self) -> Rank {
+        self.rank
+    }
+    pub fn suit(&self) -> Suit {
+        self.suit
     }
 }
 
@@ -83,13 +89,13 @@ mod tests {
     use crate::deck::card::{Card, Rank, Suit};
     #[test]
     fn test_equals() {
-        assert!(Card::new(Rank::Ace, Suit::Clubs).equals(Card::new(Rank::Ace, Suit::Clubs)))
+        assert!(Card::new(Rank::Ace, Suit::Clubs).equals(&Card::new(Rank::Ace, Suit::Clubs)))
     }
     #[test]
     fn test_not_equals() {
-        assert!(!Card::new(Rank::Ace, Suit::Clubs).equals(Card::new(Rank::Two, Suit::Clubs)));
+        assert!(!Card::new(Rank::Ace, Suit::Clubs).equals(&Card::new(Rank::Two, Suit::Clubs)));
 
-        assert!(!Card::new(Rank::Ace, Suit::Clubs).equals(Card::new(Rank::Ace, Suit::Hearts)));
+        assert!(!Card::new(Rank::Ace, Suit::Clubs).equals(&Card::new(Rank::Ace, Suit::Hearts)));
     }
     #[test]
     fn test_print() {

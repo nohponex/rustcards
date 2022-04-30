@@ -1,3 +1,5 @@
+extern crate core;
+
 use crate::deck::stack::Stack;
 
 mod deck;

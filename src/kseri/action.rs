@@ -1,6 +1,6 @@
 use crate::deck::card::Card;
 
-enum Action {
+pub enum Action {
     Played(Card),
     Folded
 }
