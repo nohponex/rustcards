@@ -9,7 +9,9 @@ mod deck;
 mod kseri;
 
 fn main() {
-    let mut g: Game = Game::new(4, deck());
+    let mut mydeck = deck();
+    mydeck.shuffle();
+    let mut g: Game = Game::new(4, mydeck);
 
     while !g.ended() {
         g.print();
