@@ -131,14 +131,12 @@ impl Game {
             return;
         }
         println!();
-        println!("state:");
         println!("cards down: {}", self.played);
         println!("current player turn: {}", self.current_player);
         println!(
             "player can play on of: {}",
             self.stacks.get(&self.current_player).unwrap()
         );
-        println!("deck: {}", self.deck);
     }
 }
 
