@@ -122,7 +122,6 @@ impl Game {
                     }
                 }
             }
-            Action::Folded => {}
         }
     }
 
