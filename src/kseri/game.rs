@@ -4,6 +4,7 @@ use crate::kseri::action::Action;
 use crate::kseri::player::{GameOfPlayers, Player};
 use crate::kseri::points;
 use crate::Stack;
+use std::iter::Iterator;
 use std::collections::HashMap;
 
 pub(crate) struct Game {
@@ -24,13 +25,16 @@ impl Game {
             let c = deck.pop().unwrap();
             played.push(c)
         }
-        let mut stacks = GameOfPlayers::new(number_of_players)
+
+        let players_iter = || GameOfPlayers::new(number_of_players);
+
+        let mut stacks = players_iter()
             .map(|key| (key, Stack::empty()))
             .collect();
-        let mut picked = GameOfPlayers::new(number_of_players)
+        let mut picked = players_iter()
             .map(|key| (key, Stack::empty()))
             .collect();
-        let mut kseres = GameOfPlayers::new(number_of_players)
+        let mut kseres = players_iter()
             .map(|key| (key, 0))
             .collect();
 
@@ -51,13 +55,18 @@ impl Game {
     }
 
     fn deal_cards(&mut self) {
-        for p in GameOfPlayers::new(self.number_of_players) {
+        for p in self.players_iter() {
             let player_stack = self.stacks.get_mut(&p).unwrap();
             for _ in 1..7 {
                 let c = self.deck.pop().unwrap();
                 player_stack.push(c);
             }
         }
+    }
+
+    //todo return iterator signature
+    fn players_iter(&self) -> GameOfPlayers {
+        GameOfPlayers::new(self.number_of_players)
     }
 
     pub(crate) fn apply(&mut self, action: Action) {
@@ -133,7 +142,7 @@ impl Game {
 
     pub fn print(&self) {
         if self.ended {
-            for p in GameOfPlayers::new(self.number_of_players) {
+            for p in self.players_iter() {
                 println!("Player {} has {} points", p, self.points.get(&p).unwrap())
             }
             println!("game over! Winner is Player {}!", self.winner().unwrap());
