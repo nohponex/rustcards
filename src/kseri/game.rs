@@ -13,7 +13,7 @@ struct Game {
     number_of_players: u8,
     stacks: HashMap<Player, Stack>,
     picked: HashMap<Player, Stack>,
-    kseres: HashMap<Player, u8>,
+    kseres: HashMap<Player, u32>,
 }
 impl Game {
     fn new(number_of_players: u8, mut deck: Stack) -> Game {
@@ -67,11 +67,25 @@ impl Game {
 
                 match (self.played.peek(), card.rank()) {
                     (Some(a), b) if a.rank() == b => {
-                        //self.kseres.get_mut(&self.current_player).unwrap().
-                        //todo take all
+                        self.kseres.insert(
+                            self.current_player,
+                            self.kseres.get(&self.current_player).unwrap() + 1,
+                        );
+                        let picked = self.picked.get_mut(&self.current_player).unwrap();
+                        for c in self.played.iter() {
+                            //todo fix iterator
+                            picked.push(*c);
+                        }
+                        self.played = Stack::empty();
+                        picked.push(card);
                     }
                     (Some(_), Rank::Jack) => {
-                        //todo take all
+                        let picked = self.picked.get_mut(&self.current_player).unwrap();
+                        for c in self.played.iter() {
+                            picked.push(*c);
+                        }
+                        self.played = Stack::empty();
+                        picked.push(card);
                     }
                     (_, _) => self.played.push(card),
                 }
@@ -92,9 +106,12 @@ impl Game {
 }
 
 mod test {
+    use crate::deck::card::{Card, Rank, Suit};
     use crate::deck::deck::deck;
+    use crate::kseri::action::Action;
     use crate::kseri::game::Game;
     use crate::kseri::player::Player;
+    use crate::Stack;
 
     #[test]
     fn testNewGame() {
@@ -115,5 +132,40 @@ mod test {
     fn testPrint() {
         let g = Game::new(4, deck());
         g.print()
+    }
+
+    #[test]
+    fn test_apply() {
+        let mut g = Game::new(
+            2,
+            Stack::from_vec(vec![
+                Card::new(Rank::Ace, Suit::Spades),
+                Card::new(Rank::Two, Suit::Spades),
+                Card::new(Rank::Three, Suit::Spades),
+                Card::new(Rank::Four, Suit::Spades),
+                //p1
+                Card::new(Rank::Five, Suit::Clubs),
+                Card::new(Rank::Six, Suit::Clubs),
+                Card::new(Rank::Seven, Suit::Clubs),
+                Card::new(Rank::Eight, Suit::Clubs),
+                Card::new(Rank::Nine, Suit::Clubs),
+                Card::new(Rank::Jack, Suit::Clubs),
+                //p2
+                Card::new(Rank::Five, Suit::Diamonds),
+                Card::new(Rank::Six, Suit::Diamonds),
+                Card::new(Rank::Seven, Suit::Diamonds),
+                Card::new(Rank::Eight, Suit::Diamonds),
+                Card::new(Rank::Nine, Suit::Diamonds),
+                Card::new(Rank::Ten, Suit::Diamonds),
+            ]),
+        );
+        assert_eq!(*g.kseres.get(&Player::Player1).unwrap(), 0);
+        assert_eq!(g.played.len(), 4);
+        assert_eq!(g.picked.get(&Player::Player1).unwrap().len(), 0);
+
+        g.apply(Action::Played(Card::new(Rank::Jack, Suit::Clubs)));
+        assert_eq!(*g.kseres.get(&Player::Player1).unwrap(), 0);
+        assert_eq!(g.played.len(), 0);
+        assert_eq!(g.picked.get(&Player::Player1).unwrap().len(), 5);
     }
 }

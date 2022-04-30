@@ -1,4 +1,5 @@
 use std::fmt;
+use std::slice::Iter;
 use crate::deck::card::Card;
 
 use rand::thread_rng;
@@ -37,6 +38,10 @@ impl Stack {
 
     pub fn pop(&mut self) -> Option<Card> {
         self.cards.pop()
+    }
+
+    pub fn iter(&mut self) -> Iter<'_, Card> {
+        self.cards.iter()
     }
 
     pub fn remove(&mut self, card: &Card) -> bool {
