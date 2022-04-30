@@ -14,6 +14,7 @@ struct Game {
     stacks: HashMap<Player, Stack>,
     picked: HashMap<Player, Stack>,
     kseres: HashMap<Player, u32>,
+    ended: bool,
 }
 impl Game {
     fn new(number_of_players: u8, mut deck: Stack) -> Game {
@@ -49,6 +50,23 @@ impl Game {
             deck: deck,
             picked: picked,
             kseres: kseres,
+            ended: false,
+        }
+    }
+
+    fn give_cards(&mut self) {
+        let mut p = Player::Player1;
+        loop {
+            let player_stack = self.stacks.get_mut(&p).unwrap();
+            for n in 1..7 {
+                let c = self.deck.pop().unwrap();
+                player_stack.push(c);
+            }
+            p = p.next(self.number_of_players);
+
+            if p == Player::Player1 {
+                break;
+            }
         }
     }
 
@@ -64,6 +82,8 @@ impl Game {
                 {
                     panic!("not allowed card");
                 }
+
+                println!("Player {} played {}", self.current_player, card);
 
                 match (self.played.peek(), card.rank()) {
                     (Some(a), b) if a.rank() == b => {
@@ -89,12 +109,29 @@ impl Game {
                     }
                     (_, _) => self.played.push(card),
                 }
+
+                self.current_player = self.current_player.next(self.number_of_players);
+
+                if self.current_player == Player::Player1
+                    && self.stacks.get(&Player::Player1).unwrap().len() == 0
+                {
+                    if self.deck.len() == 0 {
+                        self.ended = true;
+                    } else {
+                        self.give_cards();
+                    }
+                }
             }
             Action::Folded => {}
         }
     }
 
     pub fn print(&self) {
+        if self.ended {
+            println!("game over!");
+            return;
+        }
+        println!();
         println!("state:");
         println!("cards down: {}", self.played);
         println!("current player turn: {}", self.current_player);
@@ -102,6 +139,7 @@ impl Game {
             "player can play on of: {}",
             self.stacks.get(&self.current_player).unwrap()
         );
+        println!("deck: {}", self.deck);
     }
 }
 
@@ -115,7 +153,7 @@ mod test {
 
     #[test]
     fn testNewGame() {
-        let g = Game::new(4, deck());
+        let mut g = Game::new(4, deck());
 
         assert_eq!(g.current_player, Player::Player1);
         assert_eq!(g.number_of_players, 4);
@@ -126,6 +164,19 @@ mod test {
         assert_eq!(g.stacks.get(&Player::Player2).unwrap().len(), 6);
         assert_eq!(g.stacks.get(&Player::Player3).unwrap().len(), 6);
         assert_eq!(g.stacks.get(&Player::Player4).unwrap().len(), 6);
+    }
+
+    #[test]
+    fn test_give_cards() {
+        let mut g = Game::new(4, deck());
+
+        g.give_cards();
+
+        assert_eq!(g.deck.len(), 52 - 4 - (4 * 12));
+        assert_eq!(g.stacks.get(&Player::Player1).unwrap().len(), 12);
+        assert_eq!(g.stacks.get(&Player::Player2).unwrap().len(), 12);
+        assert_eq!(g.stacks.get(&Player::Player3).unwrap().len(), 12);
+        assert_eq!(g.stacks.get(&Player::Player4).unwrap().len(), 12);
     }
 
     #[test]
@@ -167,5 +218,17 @@ mod test {
         assert_eq!(*g.kseres.get(&Player::Player1).unwrap(), 0);
         assert_eq!(g.played.len(), 0);
         assert_eq!(g.picked.get(&Player::Player1).unwrap().len(), 5);
+    }
+
+    #[test]
+    fn test_game() {
+        let mut g: Game = Game::new(4, deck());
+
+        while !g.ended {
+            g.print();
+            let card_to_play = g.stacks.get(&g.current_player).unwrap().peek().unwrap();
+            g.apply(Action::Played(card_to_play.clone()));
+        }
+        g.print();
     }
 }
