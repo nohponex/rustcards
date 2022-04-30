@@ -45,15 +45,15 @@ impl Game {
             ended: false,
         };
 
-        g.give_cards();
+        g.deal_cards();
 
         return g;
     }
 
-    fn give_cards(&mut self) {
+    fn deal_cards(&mut self) {
         for p in GameOfPlayers::new(self.number_of_players) {
             let player_stack = self.stacks.get_mut(&p).unwrap();
-            for n in 1..7 {
+            for _ in 1..7 {
                 let c = self.deck.pop().unwrap();
                 player_stack.push(c);
             }
@@ -124,7 +124,7 @@ impl Game {
 
                         self.ended = true;
                     } else {
-                        self.give_cards();
+                        self.deal_cards();
                     }
                 }
             }
@@ -202,7 +202,7 @@ mod test {
     fn test_give_cards() {
         let mut g = Game::new(4, deck());
 
-        g.give_cards();
+        g.deal_cards();
 
         assert_eq!(g.deck.len(), 52 - 4 - (4 * 12));
         assert_eq!(g.stacks.get(&Player::Player1).unwrap().len(), 12);
