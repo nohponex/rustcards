@@ -28,13 +28,13 @@ impl Game {
 
         let players_iter = || GameOfPlayers::new(number_of_players);
 
-        let mut stacks = players_iter()
+        let stacks = players_iter()
             .map(|key| (key, Stack::empty()))
             .collect();
-        let mut picked = players_iter()
+        let picked = players_iter()
             .map(|key| (key, Stack::empty()))
             .collect();
-        let mut points = players_iter()
+        let points = players_iter()
             .map(|key| (key, 0))
             .collect();
 
