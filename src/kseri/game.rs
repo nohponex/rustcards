@@ -6,18 +6,18 @@ use crate::kseri::points;
 use crate::Stack;
 use std::collections::HashMap;
 
-struct Game {
+pub(crate) struct Game {
     current_player: Player,
     played: Stack,
     deck: Stack,
     number_of_players: u8,
-    stacks: HashMap<Player, Stack>,
+    pub(crate) stacks: HashMap<Player, Stack>,
     picked: HashMap<Player, Stack>,
     points: HashMap<Player, u32>,
     ended: bool,
 }
 impl Game {
-    fn new(number_of_players: u8, mut deck: Stack) -> Game {
+    pub(crate) fn new(number_of_players: u8, mut deck: Stack) -> Game {
         let mut played = Stack::empty();
         //play 4 cards
         for n in 1..5 {
@@ -60,7 +60,7 @@ impl Game {
         }
     }
 
-    fn apply(&mut self, action: Action) {
+    pub(crate) fn apply(&mut self, action: Action) {
         match action {
             Action::Played(card) => {
                 //make sure player had this card and remove it
@@ -116,13 +116,7 @@ impl Game {
                     && self.stacks.get(&Player::Player1).unwrap().len() == 0
                 {
                     if self.deck.len() == 0 {
-                        let player_with_most_cards = self
-                            .picked
-                            .iter()
-                            .map(|(p, s)| (p, s.len()))
-                            .max_by_key(|&(p, l)| l)
-                            .unwrap()
-                            .0;
+                        let player_with_most_cards = self.player_with_most_cards();
                         println!("most cards: Player {}", player_with_most_cards);
                         self.points
                             .entry(*player_with_most_cards)
@@ -142,8 +136,7 @@ impl Game {
             for p in GameOfPlayers::new(self.number_of_players) {
                 println!("Player {} has {} points", p, self.points.get(&p).unwrap())
             }
-            let winner = self.points.iter().max_by_key(|&(_, v)| v).unwrap().0;
-            println!("game over! Winner is Player {}!", winner);
+            println!("game over! Winner is Player {}!", self.winner().unwrap());
 
             return;
         }
@@ -154,6 +147,31 @@ impl Game {
             "player can play on of: {}",
             self.stacks.get(&self.current_player).unwrap()
         );
+    }
+
+    pub fn ended(&self) -> bool {
+        self.ended
+    }
+
+    pub fn current_player(&self) -> Player {
+        self.current_player
+    }
+
+    fn winner(&self) -> Option<&Player> {
+        match self.ended {
+            true => Some(self.points.iter().max_by_key(|&(_, v)| v).unwrap().0),
+            false => None,
+        }
+    }
+
+    fn player_with_most_cards(&self) -> &Player {
+        return self
+            .picked
+            .iter()
+            .map(|(p, s)| (p, s.len()))
+            .max_by_key(|&(p, l)| l)
+            .unwrap()
+            .0;
     }
 }
 
