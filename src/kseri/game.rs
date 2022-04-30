@@ -2,6 +2,7 @@ use crate::deck::card::{Card, Rank};
 use crate::deck::stack;
 use crate::kseri::action::Action;
 use crate::kseri::player::{GameOfPlayers, Player};
+use crate::kseri::points;
 use crate::Stack;
 use std::collections::HashMap;
 
@@ -12,7 +13,7 @@ struct Game {
     number_of_players: u8,
     stacks: HashMap<Player, Stack>,
     picked: HashMap<Player, Stack>,
-    kseres: HashMap<Player, u32>,
+    points: HashMap<Player, u32>,
     ended: bool,
 }
 impl Game {
@@ -40,7 +41,7 @@ impl Game {
             stacks: stacks,
             deck: deck,
             picked: picked,
-            kseres: kseres,
+            points: kseres,
             ended: false,
         };
 
@@ -76,19 +77,29 @@ impl Game {
 
                 match (self.played.peek(), card.rank()) {
                     (Some(a), b) if a.rank() == b => {
-                        self.kseres.insert(
-                            self.current_player,
-                            self.kseres.get(&self.current_player).unwrap() + 1,
-                        );
+                        self.points
+                            .entry(self.current_player)
+                            .and_modify(|v| {
+                                *v += match card.rank() {
+                                    Rank::Jack => 20,
+                                    _ => 10,
+                                }
+                            })
+                            .and_modify(|v| *v += self.played.points() + card.points());
+
                         let picked = self.picked.get_mut(&self.current_player).unwrap();
                         for c in self.played.iter() {
-                            //todo fix iterator
                             picked.push(*c);
                         }
+
                         self.played = Stack::empty();
                         picked.push(card);
                     }
                     (Some(_), Rank::Jack) => {
+                        self.points
+                            .entry(self.current_player)
+                            .and_modify(|v| *v += self.played.points() + card.points());
+
                         let picked = self.picked.get_mut(&self.current_player).unwrap();
                         for c in self.played.iter() {
                             picked.push(*c);
@@ -105,6 +116,18 @@ impl Game {
                     && self.stacks.get(&Player::Player1).unwrap().len() == 0
                 {
                     if self.deck.len() == 0 {
+                        let player_with_most_cards = self
+                            .picked
+                            .iter()
+                            .map(|(p, s)| (p, s.len()))
+                            .max_by_key(|&(p, l)| l)
+                            .unwrap()
+                            .0;
+                        println!("most cards: Player {}", player_with_most_cards);
+                        self.points
+                            .entry(*player_with_most_cards)
+                            .and_modify(|v| *v += 3);
+
                         self.ended = true;
                     } else {
                         self.give_cards();
@@ -116,7 +139,12 @@ impl Game {
 
     pub fn print(&self) {
         if self.ended {
-            println!("game over!");
+            for p in GameOfPlayers::new(self.number_of_players) {
+                println!("Player {} has {} points", p, self.points.get(&p).unwrap())
+            }
+            let winner = self.points.iter().max_by_key(|&(_, v)| v).unwrap().0;
+            println!("game over! Winner is Player {}!", winner);
+
             return;
         }
         println!();
@@ -196,12 +224,12 @@ mod test {
                 Card::new(Rank::Ten, Suit::Diamonds),
             ]),
         );
-        assert_eq!(*g.kseres.get(&Player::Player1).unwrap(), 0);
+        assert_eq!(*g.points.get(&Player::Player1).unwrap(), 0);
         assert_eq!(g.played.len(), 4);
         assert_eq!(g.picked.get(&Player::Player1).unwrap().len(), 0);
 
         g.apply(Action::Played(Card::new(Rank::Jack, Suit::Clubs)));
-        assert_eq!(*g.kseres.get(&Player::Player1).unwrap(), 0);
+        assert_eq!(*g.points.get(&Player::Player1).unwrap(), 20);
         assert_eq!(g.played.len(), 0);
         assert_eq!(g.picked.get(&Player::Player1).unwrap().len(), 5);
     }

@@ -40,7 +40,7 @@ impl Stack {
         self.cards.pop()
     }
 
-    pub fn iter(&mut self) -> Iter<'_, Card> {
+    pub fn iter(&self) -> Iter<'_, Card> {
         self.cards.iter()
     }
 
