@@ -1,10 +1,9 @@
 use crate::deck::card::{Card, Rank};
 use crate::deck::stack;
 use crate::kseri::action::Action;
-use crate::kseri::player::Player;
+use crate::kseri::player::{GameOfPlayers, Player};
 use crate::Stack;
 use std::collections::HashMap;
-use std::thread::current;
 
 struct Game {
     current_player: Player,
@@ -24,26 +23,18 @@ impl Game {
             let c = deck.pop().unwrap();
             played.push(c)
         }
-        let mut stacks = HashMap::with_capacity(number_of_players as usize);
-        let mut picked = HashMap::with_capacity(number_of_players as usize);
-        let mut kseres = HashMap::with_capacity(number_of_players as usize);
+        let mut stacks = GameOfPlayers::new(number_of_players)
+            .map(|key| (key, Stack::empty()))
+            .collect();
+        let mut picked = GameOfPlayers::new(number_of_players)
+            .map(|key| (key, Stack::empty()))
+            .collect();
+        let mut kseres = GameOfPlayers::new(number_of_players)
+            .map(|key| (key, 0))
+            .collect();
 
-        let mut current_player = Player::Player1;
-
-        for n in 1..number_of_players + 1 {
-            let mut player_stack = Stack::empty();
-            for n in 1..7 {
-                let c = deck.pop().unwrap();
-                player_stack.push(c);
-            }
-            stacks.insert(current_player, player_stack);
-            picked.insert(current_player, Stack::empty());
-            kseres.insert(current_player, 0);
-            current_player = current_player.next(number_of_players)
-        }
-
-        Game {
-            current_player: current_player,
+        let mut g = Game {
+            current_player: Player::Player1,
             number_of_players: number_of_players,
             played: played,
             stacks: stacks,
@@ -51,21 +42,19 @@ impl Game {
             picked: picked,
             kseres: kseres,
             ended: false,
-        }
+        };
+
+        g.give_cards();
+
+        return g;
     }
 
     fn give_cards(&mut self) {
-        let mut p = Player::Player1;
-        loop {
+        for p in GameOfPlayers::new(self.number_of_players) {
             let player_stack = self.stacks.get_mut(&p).unwrap();
             for n in 1..7 {
                 let c = self.deck.pop().unwrap();
                 player_stack.push(c);
-            }
-            p = p.next(self.number_of_players);
-
-            if p == Player::Player1 {
-                break;
             }
         }
     }
