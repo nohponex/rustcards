@@ -86,14 +86,19 @@ impl Game {
 
                 match (self.played.peek(), card.rank()) {
                     (Some(a), b) if a.rank() == b => {
+                        if self.played.len() == 1 {
+                            self.points
+                                .entry(self.current_player)
+                                .and_modify(|v| {
+                                    *v += match card.rank() {
+                                        Rank::Jack => 20,
+                                        _ => 10,
+                                    }
+                                });
+                            println!("Kseri!")
+                        }
                         self.points
                             .entry(self.current_player)
-                            .and_modify(|v| {
-                                *v += match card.rank() {
-                                    Rank::Jack => 20,
-                                    _ => 10,
-                                }
-                            })
                             .and_modify(|v| *v += self.played.points() + card.points());
 
                         let picked = self.picked.get_mut(&self.current_player).unwrap();
