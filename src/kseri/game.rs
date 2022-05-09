@@ -4,8 +4,8 @@ use crate::kseri::action::Action;
 use crate::kseri::player::{GameOfPlayers, Player};
 use crate::kseri::points;
 use crate::Stack;
-use std::iter::Iterator;
 use std::collections::HashMap;
+use std::iter::Iterator;
 
 pub(crate) struct Game {
     current_player: Player,
@@ -28,15 +28,9 @@ impl Game {
 
         let players_iter = || GameOfPlayers::new(number_of_players);
 
-        let stacks = players_iter()
-            .map(|key| (key, Stack::empty()))
-            .collect();
-        let picked = players_iter()
-            .map(|key| (key, Stack::empty()))
-            .collect();
-        let points = players_iter()
-            .map(|key| (key, 0))
-            .collect();
+        let stacks = players_iter().map(|key| (key, Stack::empty())).collect();
+        let picked = players_iter().map(|key| (key, Stack::empty())).collect();
+        let points = players_iter().map(|key| (key, 0)).collect();
 
         let mut g = Game {
             current_player: Player::Player1,
@@ -87,14 +81,12 @@ impl Game {
                 match (self.played.peek(), card.rank()) {
                     (Some(a), b) if a.rank() == b => {
                         if self.played.len() == 1 {
-                            self.points
-                                .entry(self.current_player)
-                                .and_modify(|v| {
-                                    *v += match card.rank() {
-                                        Rank::Jack => 20,
-                                        _ => 10,
-                                    }
-                                });
+                            self.points.entry(self.current_player).and_modify(|v| {
+                                *v += match card.rank() {
+                                    Rank::Jack => 20,
+                                    _ => 10,
+                                }
+                            });
                             println!("Kseri!")
                         }
                         self.points
@@ -126,23 +118,31 @@ impl Game {
 
                 self.current_player = self.current_player.next(self.number_of_players);
 
-                if self.current_player == Player::Player1
-                    && self.stacks.get(&Player::Player1).unwrap().len() == 0
-                {
-                    if self.deck.len() == 0 {
-                        let player_with_most_cards = self.player_with_most_cards();
-                        println!("most cards: Player {}", player_with_most_cards);
-                        self.points
-                            .entry(*player_with_most_cards)
-                            .and_modify(|v| *v += 3);
+                if self.should_deal() {
+                    self.deal_cards();
+                }
 
-                        self.ended = true;
-                    } else {
-                        self.deal_cards();
-                    }
+                if self.was_last_card_played() {
+                    let player_with_most_cards = self.player_with_most_cards();
+                    println!("most cards: Player {}", player_with_most_cards);
+                    self.points
+                        .entry(*player_with_most_cards)
+                        .and_modify(|v| *v += 3);
+
+                    self.ended = true;
                 }
             }
         }
+    }
+
+    fn should_deal(&self) -> bool {
+        return !self.was_last_card_played()
+            && self.current_player == Player::Player1
+            && self.stacks.get(&Player::Player1).unwrap().len() == 0;
+    }
+
+    fn was_last_card_played(&self) -> bool {
+        return self.stacks.iter().map(|(_, s)| s.len()).max() == Some(0) && self.deck.len() == 0;
     }
 
     pub fn print(&self) {
