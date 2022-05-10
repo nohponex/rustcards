@@ -49,11 +49,13 @@ impl Game {
     }
 
     fn deal_cards(&mut self) {
-        for p in self.players_iter() {
-            let player_stack = self.stacks.get_mut(&p).unwrap();
-            for _ in 1..7 {
-                let c = self.deck.pop().unwrap();
-                player_stack.push(c);
+        for _ in 1..7 {
+            for p in self.players_iter() {
+                let player_stack = self.stacks.get_mut(&p).unwrap();
+                match self.deck.pop() {
+                    Some(c) => { player_stack.push(c) }
+                    None => {}
+                }
             }
         }
     }
@@ -213,7 +215,7 @@ mod test {
     }
 
     #[test]
-    fn test_give_cards() {
+    fn test_deal_cards() {
         let mut g = Game::new(4, deck());
 
         g.deal_cards();
