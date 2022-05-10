@@ -32,6 +32,6 @@ mod test {
             Card::new(Rank::Five, Suit::Hearts),
         ]);
 
-        assert_eq!(s.points(), 30);
+        assert_eq!(s.points(), 4);
     }
 }

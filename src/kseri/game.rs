@@ -263,7 +263,7 @@ mod test {
         assert_eq!(g.picked.get(&Player::Player1).unwrap().len(), 0);
 
         g.apply(Action::Played(Card::new(Rank::Jack, Suit::Clubs)));
-        assert_eq!(*g.points.get(&Player::Player1).unwrap(), 20);
+        assert_eq!(*g.points.get(&Player::Player1).unwrap(), 3);
         assert_eq!(g.played.len(), 0);
         assert_eq!(g.picked.get(&Player::Player1).unwrap().len(), 5);
     }
