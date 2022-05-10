@@ -11,7 +11,7 @@ mod kseri;
 fn main() {
     let mut mydeck = deck();
     mydeck.shuffle();
-    let mut g: Game = Game::new(4, mydeck);
+    let mut g: Game = Game::new(2, mydeck);
 
     while !g.ended() {
         g.print();

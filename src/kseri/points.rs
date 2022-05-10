@@ -4,9 +4,9 @@ use crate::Stack;
 impl Card {
     pub fn points(&self) -> u32 {
         match (self.rank(), self.suit()) {
-            (Rank::Ace | Rank::King | Rank::Queen | Rank::Jack, _) => 10,
-            (Rank::Two, Suit::Clubs) => 10,
-            (Rank::Ten, Suit::Diamonds) => 10,
+            (Rank::Ace | Rank::King | Rank::Queen | Rank::Jack, _) => 1,
+            (Rank::Two, Suit::Clubs) => 1,
+            (Rank::Ten, Suit::Diamonds) => 2,
             (_, _) => 0,
         }
     }
